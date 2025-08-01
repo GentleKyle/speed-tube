@@ -1,16 +1,17 @@
 # speed-tube
-Sometimes you just wanna go fast and YouTube does not get it. 
+Sometimes you just wanna go fast and YouTube does not get it.  
 
-Default playback speed set to 2.0
+Changes default playback speed and adds some keybinds for quick adjustments while visiting YouTube. Also added automatic video start on load.
 
-Ctrl + Left Arrow --- decreases playback speed
+Default playback speed set to 2.0  
+Ctrl + Left Arrow --- decreases playback speed  
 Ctrl + Right Arrow --- increases playback speed
 
 This is not an official extension so you need to load it a little differently.
 
-1. Install
+1. Download ZIP and extract
 2. Go to browser Extension settings
 3. Enable Developer mode
 4. Click "Load unpacked"
-5. Select speed-tube folder
-6. Ya done son
+5. Select speed-tube-main folder
+6. Ya done son - Gotta go fast!

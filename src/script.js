@@ -1,33 +1,32 @@
 "use strict";
 (function() {
-
     const DEFAULT_PLAYBACK_SPD = 2;
 
-    window.addEventListener("load", () => {
-        const video = document.getElementsByTagName("video")[0];
+    const handleLoad = () => {
+        setTimeout(() => {
+            const video = document.getElementsByTagName("video")[0];
 
-        if (!video) {
-            return;
-        }
-
-        //sets video default speed on first load
-        video.playbackRate = DEFAULT_PLAYBACK_SPD;
-
-        //just play on load - so I do not have to press play
-        //load fires too early - keep clicking until it works
-        let count = 0;
-        const playBut = document.getElementsByClassName("ytp-play-button")[0];
-        let intervalId = setInterval(() => {
-            if (video.paused && count < 100) {
-                playBut.click();
-                count++;
+            if (!video) {
+                return;
             }
-            else {
-                clearInterval(intervalId);
-            }
-        }, 222)
+
+            //sets video default speed on first load
+            video.playbackRate = DEFAULT_PLAYBACK_SPD;
+        }, 500);
         
-    });
+    };
+    
+    //first page load - you write/paste in a video url directly
+    window.addEventListener("load", handleLoad);
+    //every 1sec check if url has changed - link click
+    let currentUrl = location.href;
+    setInterval(() => {
+        if (location.href !== currentUrl) {
+            currentUrl = location.href;
+            handleLoad();
+        }
+    }, 1022);
+
 
     window.addEventListener("keyup", (event) => {
         const video = document.getElementsByTagName("video")[0];
@@ -36,16 +35,14 @@
             return;
         }
 
-
         if (event.ctrlKey) {
-            if (event.key === "ArrowRight") {
+            if (event.key === "ArrowUp") {
                 incrementPBR(video);
             }
-            if (event.key === "ArrowLeft") {
+            if (event.key === "ArrowDown") {
                 decrementPBR(video);
             }
         }
-
     });
 
 
@@ -57,7 +54,7 @@
         }
 
         displaySpeed(video.playbackRate);
-    }
+    };
 
     const decrementPBR = (video) => {
         const currentPBR = video.playbackRate;
@@ -67,7 +64,7 @@
         }
 
         displaySpeed(video.playbackRate);
-    }
+    };
 
     let timerId = null;
     const displaySpeed = (speed) => {
@@ -107,6 +104,6 @@
             }, 750);               
         }
 
-    }
+    };
 
 })(); //invokes unnamed function - Immediately Invoked Function Expression(IIFE)

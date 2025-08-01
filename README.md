@@ -3,8 +3,8 @@ Sometimes you just wanna go fast and YouTube does not get it.
 
 Default playback speed set to 2.0
 
-Ctrl + Left Arrow --- decreases playback speed
-Ctrl + Right Arrow --- increases playback speed
+Ctrl + Down Arrow --- decreases playback speed
+Ctrl + Up Arrow --- increases playback speed
 
 This is not an official extension so you need to load it a little differently.
 

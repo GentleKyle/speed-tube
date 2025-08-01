@@ -4,7 +4,7 @@ They cap your speed at 2.0, but I want more. This allows it.
 
 Changes default playback speed and adds some keybinds for quick adjustments while visiting YouTube.
 
-Ctrl + Down Arrow --- decreases playback speed
+Ctrl + Down Arrow --- decreases playback speed  
 Ctrl + Up Arrow --- increases playback speed
 
 This is not an official extension so you need to load it a little differently.

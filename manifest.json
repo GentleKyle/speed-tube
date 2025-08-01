@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Speed Tube",
-    "description": "Speed up the tube!",
+    "description": "Starts YouTube videos, sets default playback speed, ctrl + left/right arrows to decrease/increase speed",
     "version": "1.0",
     "icons" : {},
     "content_scripts": [

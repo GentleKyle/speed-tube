@@ -1,2 +1,16 @@
 # speed-tube
-Easily allow speeds over 2.0x and set a default playback speed on Youtube. 
+Sometimes you just wanna go fast and YouTube does not get it. 
+
+Default playback speed set to 2.0
+
+Ctrl + Left Arrow --- decreases playback speed
+Ctrl + Right Arrow --- increases playback speed
+
+This is not an official extension so you need to load it a little differently.
+
+1. Install
+2. Go to browser Extension settings
+3. Enable Developer mode
+4. Click "Load unpacked"
+5. Select speed-tube folder
+6. Ya done son

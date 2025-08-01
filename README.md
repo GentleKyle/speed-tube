@@ -16,3 +16,5 @@ This is not an official extension so you need to load it a little differently.
 4. Click "Load unpacked"
 5. Select speed-tube-main folder
 6. Ya done son - Gotta go fast!
+
+Note: If you watch in Incognito/InPrivate then you need to enable it. Click "Details" for Speed Tube in Extensions then find the option to enable in Incognito/InPrivate and toggle it on. :)

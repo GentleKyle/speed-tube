@@ -1,5 +1,6 @@
 # speed-tube
 Sometimes you just wanna go fast and YouTube does not get it.  
+They cap your speed at 2.0, but I want more. This allows it.
 
 Changes default playback speed and adds some keybinds for quick adjustments while visiting YouTube. Also added automatic video start on load.
 

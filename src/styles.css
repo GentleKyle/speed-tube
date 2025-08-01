@@ -1,0 +1,19 @@
+#my_pbr_display {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    height: fit-content;
+    width: fit-content;
+
+    padding: 12px 22px;
+    color: black;
+    font-size: x-large;
+    text-align: center;
+    
+    border-radius: 22px;
+    background-color: rgb(222, 222, 222);
+    z-index: 2222;
+}

@@ -11,6 +11,9 @@
         }
 
         video.playbackRate = DEFAULT_PLAYBACK_SPD;
+        //just play on load - so I do not have to press play
+        //does not work
+        video.autoplay = true;
     });
 
     window.addEventListener("keyup", (event) => {
@@ -39,6 +42,8 @@
         if (currentPBR < 6) {
             video.playbackRate = currentPBR + 0.25;
         }
+
+        displaySpeed(video.playbackRate);
     }
 
     const decrementPBR = (video) => {
@@ -47,8 +52,26 @@
         if (currentPBR > 0.25) {
             video.playbackRate = currentPBR - 0.25;
         }
+
+        displaySpeed(video.playbackRate);
     }
 
+    const displaySpeed = (speed) => {
+        //create the div if no exist - first key press
+        if (!document.getElementById("my_pbr_display")) {
+            const videoDiv = document.getElementById("movie_player");
 
+            const newDiv = document.createElement('div');
+            newDiv.id = "my_pbr_display";
+            newDiv.style.opacity = 0;
+
+            videoDiv.append(newDiv);
+        }
+        
+        const speedDiv = document.getElementById("my_pbr_display");
+        speedDiv.textContent = `${speed}x`;
+        speedDiv.style.opacity = 0.8;
+
+    }
 
 })(); //invokes unnamed function - Immediately Invoked Function Expression(IIFE)

@@ -11,6 +11,9 @@
             ],
             "matches": [
                 "https://www.youtube.com/*"
+            ],
+            "css": [
+                "src/styles.css"
             ]
         }
     ]

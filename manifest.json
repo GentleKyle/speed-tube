@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "Speed Tube",
+    "description": "Speed up the tube!",
+    "version": "1.0",
+    "icons" : {},
+    "content_scripts": [
+        {
+            "js": [
+                "/src/script.js"
+            ],
+            "matches": [
+                "https://www.youtube.com/*"
+            ]
+        }
+    ]
+}

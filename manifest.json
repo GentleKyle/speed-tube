@@ -7,7 +7,7 @@
     "content_scripts": [
         {
             "js": [
-                "/src/script.js"
+                "/src/inject.js"
             ],
             "run_at": "document_start",
             "matches": [
@@ -16,6 +16,12 @@
             "css": [
                 "src/styles.css"
             ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["/src/script.js"],
+            "matches": ["https://www.youtube.com/*"]
         }
     ]
 }

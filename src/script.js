@@ -4,7 +4,8 @@
 
     const handleLoad = () => {
         setTimeout(() => {
-            const video = document.getElementsByTagName("video")[0];
+            const container = document.getElementById("player-container");
+            const video = container.getElementsByTagName("video")[0];
 
             if (!video) {
                 return;
@@ -29,7 +30,8 @@
 
 
     window.addEventListener("keyup", (event) => {
-        const video = document.getElementsByTagName("video")[0];
+        const container = document.getElementById("player-container");
+        const video = container.getElementsByTagName("video")[0];
 
         if (!video) {
             return;
@@ -53,7 +55,7 @@
             video.playbackRate = currentPBR + 0.25;
         }
 
-        displaySpeed(video.playbackRate);
+        displaySpeed(video);
     };
 
     const decrementPBR = (video) => {
@@ -63,14 +65,14 @@
             video.playbackRate = currentPBR - 0.25;
         }
 
-        displaySpeed(video.playbackRate);
+        displaySpeed(video);
     };
 
     let timerId = null;
-    const displaySpeed = (speed) => {
+    const displaySpeed = (video) => {
+        const speed = video.playbackRate;
         //create the div if no exist - first key press
         if (!document.getElementById("my_pbr_display")) {
-            const videoDiv = document.getElementById("movie_player");
 
             const newDiv = document.createElement('div');
             newDiv.id = "my_pbr_display";
@@ -79,7 +81,7 @@
                 newDiv.style.opacity = 0;
             })
 
-            videoDiv.append(newDiv);
+            video.parentElement.parentElement.append(newDiv);
         }
         
         const speedDiv = document.getElementById("my_pbr_display");

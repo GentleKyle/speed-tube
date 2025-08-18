@@ -4,12 +4,15 @@
     "description": "Sets default playback speed at 2.0x and ctrl + down/up arrows decrease/increase speed",
     "version": "1.0",
     "icons" : {},
+    "permissions": [
+        "storage"
+    ],
     "content_scripts": [
         {
             "js": [
                 "/src/inject.js"
             ],
-            "run_at": "document_start",
+            "run_at": "document_idle",
             "matches": [
                 "https://www.youtube.com/*"
             ],

@@ -1,24 +1,26 @@
 (function() {
     //browser-polyfill library need for firefox - change "chrome" to "browser"
-    // chrome.storage.sync.get(["userDefaults"], (result) => {
-    //     const defaults = result.userDefaults || {
-    //         defaultPBR: 2, 
-    //         keybinds: {
-    //             speedUp: {modifier: "ctrlKey", key: "ArrowUp"},
-    //             speedDown: {modifier: "ctrlKey", key: "ArrowDown"}
-    //         }
-    //     };
-    //     const defaultsString = JSON.stringify(defaults);
+    chrome.storage.sync.get(["userDefaults"], (result) => {
+        const defaults = result.userDefaults || {
+            playbackRate: 2, 
+            keybinds: {
+                speedUp: {modifiers: ["ctrlKey"], key: "ArrowUp"},
+                speedDown: {modifiers: ["ctrlKey"], key: "ArrowDown"}
+            },
+            maxPBR: 6
+        };
+        //max > 2
+        const defaultsString = JSON.stringify(defaults);
 console.log("is this running?");
         const script = document.createElement("script");
         
         script.src = chrome.runtime.getURL("/src/script.js");
-        //script.dataset.defaults = defaultsString;
+        script.dataset.defaults = defaultsString;
 
         document.documentElement.appendChild(script);
 
         script.onload = () => {
             script.remove();
         };        
-    
+    });
 })();

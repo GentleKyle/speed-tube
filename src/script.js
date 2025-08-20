@@ -6,6 +6,8 @@ const defaults = JSON.parse(defaultsString);
 let currentVideo = null; //so we can set default on new
 let ytPlayer = null;
 let timerId = null;
+let lastSpeed = defaults.playbackRate;
+let settingsObserver = null;
 
 function main() {
 
@@ -14,6 +16,8 @@ console.log("main");
     overrideMediaMethod("pause"); 
     //overrideMediaMethod("load"); //caused issue certain cases - seems fine without     
 
+    //setupUrlObserver();
+
     window.addEventListener("keyup", (event) => {
         if (!ytPlayer || !ytPlayer.isConnected) {
             console.log("escaped event listener cus no ytPlayer");
@@ -21,26 +25,45 @@ console.log("main");
         }
 console.log(event);
         const isPressed = (modifier) => event[modifier];
-//if you use custom slider then keybinds then it is off(2.8x, 2.55x, etc) - could change to select speed in array
+        let currentSpeed = ytPlayer.getPlaybackRate();
         if (defaults.keybinds.speedUp.modifiers.every(isPressed)) {
             if (event.key === defaults.keybinds.speedUp.key) {
-                const newPBR = ytPlayer.getPlaybackRate() + .25;
-                if (newPBR <= defaults.maxPBR) {
-                    ytPlayer.setPlaybackRate(newPBR);
-                    displaySpeed(newPBR);
-                }
+                setSpeed(currentSpeed + .25);
             }
         }
         if (defaults.keybinds.speedDown.modifiers.every(isPressed)) {
             if (event.key === defaults.keybinds.speedDown.key) {
-                const newPBR = ytPlayer.getPlaybackRate() - .25;
-                if (newPBR >= .25) {
-                    ytPlayer.setPlaybackRate(newPBR);
-                    displaySpeed(newPBR);
-                }
+                setSpeed(currentSpeed - .25);
             }
         }
     })
+}
+//ensure that label matches slider value
+function setSpeed(newSpeed) {
+    if (newSpeed > defaults.maxPBR) {
+        newSpeed = defaults.maxPBR;
+    }
+    if (newSpeed < .25) {
+        newSpeed = .25;
+    }
+    newSpeed = parseFloat(newSpeed.toFixed(2));
+
+    const customMenuItem = ytPlayer.querySelector(".ytp-menuitem-with-footer");
+    if (customMenuItem && customMenuItem.ariaChecked === "true") {
+        console.log("in the if - customMenuItem:", customMenuItem);
+        console.log("aria:", customMenuItem.ariaChecked);
+        const label = customMenuItem.querySelector(".ytp-speedslider-text");
+        const slider = customMenuItem.querySelector(".ytp-speedslider");
+
+        slider.value = newSpeed;
+        label.textContent = newSpeed.toFixed(2);
+
+        slider.dispatchEvent(new Event("input", {bubbles: true}));
+    }
+    
+    ytPlayer.setPlaybackRate(newSpeed);
+    lastSpeed = newSpeed;
+    displaySpeed(newSpeed);    
 }
 
 function overrideMediaMethod(method) {
@@ -56,11 +79,20 @@ function overrideMediaMethod(method) {
     }
     console.log("override ", method);
 }
-
+//
 function handleMediaOverride(video, method) {
+    console.log("entry method:", method);
+
     if (ytPlayer !== video.parentElement.parentElement) {
-        ytPlayer = video.parentElement.parentElement;
-        console.log("set ytPlayer to:", ytPlayer);
+        if (settingsObserver) {
+            settingsObserver.disconnect();
+            console.log("observer disconnected");
+        }
+
+        ytPlayer = video.parentElement.parentElement; 
+        console.log("set ytPlayer to:", ytPlayer,);
+
+        setupSettingsMenuObserver();
     }
 
     if (!ytPlayer.getAvailablePlaybackRates().includes(defaults.maxPBR)) {
@@ -69,16 +101,26 @@ function handleMediaOverride(video, method) {
             ytPlayer.getAvailablePlaybackRates().push(i);
         }
     }
-console.log("Is it a new video?");
-    if (currentVideo !== ytPlayer.getVideoData().video_id) {
-        console.log("Yes, setting default PBR");
-        
-        ytPlayer.setPlaybackRate(defaults.playbackRate);
-        console.log("current PBR:", ytPlayer.getPlaybackRate());
-        console.log("ytPlayer: ", ytPlayer);
-        currentVideo = ytPlayer.getVideoData().video_id;
-    }
 
+    ytPlayer.addEventListener("onStateChange", (state) => {
+        console.log("state:", state);
+        //playing/unstarted
+        if (state === 1) {
+            const newVideo = ytPlayer.getVideoData().video_id;
+            if (currentVideo !== newVideo) {
+                console.log("state change - new vid - set defaults");
+                ytPlayer.setPlaybackRate(defaults.playbackRate);
+                lastSpeed = defaults.playbackRate;
+                currentVideo = newVideo;
+            }
+            else {
+                ytPlayer.setPlaybackRate(lastSpeed);
+            }
+        }
+//other states
+// -1(unstarted) 0(ended) 1(playing) 2(paused) 3(buffering) 
+// 5(video cued - loaded but not playing)
+    });
 }
 
 function displaySpeed(speed) {
@@ -123,6 +165,44 @@ function displaySpeed(speed) {
             timerId = null;
         }, 750);               
     }
+}
+
+function setupSettingsMenuObserver() {
+    const settingsMenu = ytPlayer.querySelector("#ytp-id-18");
+    console.log("observer setup, settingsMenu:", settingsMenu);
+
+    const observer = new MutationObserver((mutations) => {
+        console.log("mutations:", mutations);
+        const menuItems = settingsMenu.querySelectorAll(".ytp-menuitem");
+        menuItems.forEach((item, index) => {
+            //custom slider item
+            if (index === 0 && item.classList.contains("ytp-menuitem-with-footer")) {
+                const itemLabel = item.querySelector(".ytp-menuitem-label");
+                const sliderLabel = item.querySelector(".ytp-speedslider-text");
+                const slider = item.querySelector(".ytp-speedslider");
+
+                if (item.ariaChecked === "true") {
+                    sliderLabel.textContent = lastSpeed.toFixed(2) + "x";
+                    slider.value = lastSpeed;
+                    slider.dispatchEvent(new Event("input", {bubbles: true}));
+                }
+
+                console.log("slider:", slider);
+                console.log("set slider label value to:", slider.value);
+                itemLabel.textContent = `Custom (${parseFloat(slider.value).toFixed(2)})`;
+            }
+            if (!item.hasMyOnClick) {
+                item.hasMyOnClick = true;
+                item.addEventListener("click", () => {
+                    console.log("this was clicked:", item);
+                    lastSpeed = ytPlayer.getPlaybackRate();
+                });
+            }
+        });
+    });
+//SEEMS TO WORK - TEST REMOVING STUFF THAT MAYBE i DO NOT NEED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    observer.observe(settingsMenu, {childList: true});
+    settingsObserver = observer;
 }
 
 // function onYtPlayerReady(callback) {

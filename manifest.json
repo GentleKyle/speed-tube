@@ -3,7 +3,10 @@
     "name": "Speed Tube",
     "description": "Sets default playback speed at 2.0x and ctrl + down/up arrows decrease/increase speed",
     "version": "1.0",
-    "icons" : {},
+    "icons" : {
+        "48": "/static/icons/bunny_48.png",
+        "128": "/static/icons/bunny_128.png"
+    },
     "permissions": [
         "storage"
     ],

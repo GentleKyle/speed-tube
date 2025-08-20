@@ -4,8 +4,8 @@
         const defaults = result.userDefaults || {
             playbackRate: 2, 
             keybinds: {
-                speedUp: {modifiers: ["ctrlKey"], key: "ArrowUp"},
-                speedDown: {modifiers: ["ctrlKey"], key: "ArrowDown"}
+                speedUp: {modifiers: [], key: "x"},
+                speedDown: {modifiers: [], key: "z"}
             },
             maxPBR: 6
         };

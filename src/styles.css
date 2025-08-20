@@ -29,3 +29,8 @@
 .my_fadeout {
     animation: fadeOut 0.5s ease-out forwards;
 }
+
+/* hides slider from menu */
+.ytp-menuitem-with-footer {
+    display: none !important;
+}

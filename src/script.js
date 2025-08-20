@@ -26,6 +26,7 @@ console.log("main");
 console.log(event);
         const isPressed = (modifier) => event[modifier];
         let currentSpeed = ytPlayer.getPlaybackRate();
+        console.log("currentSpeed:", currentSpeed);
         if (defaults.keybinds.speedUp.modifiers.every(isPressed)) {
             if (event.key === defaults.keybinds.speedUp.key) {
                 setSpeed(currentSpeed + .25);
@@ -40,30 +41,38 @@ console.log(event);
 }
 //ensure that label matches slider value
 function setSpeed(newSpeed) {
+    console.log("newSpeed, lastSpeed", newSpeed, lastSpeed);
     if (newSpeed > defaults.maxPBR) {
         newSpeed = defaults.maxPBR;
     }
     if (newSpeed < .25) {
         newSpeed = .25;
     }
-    newSpeed = parseFloat(newSpeed.toFixed(2));
 
-    const customMenuItem = ytPlayer.querySelector(".ytp-menuitem-with-footer");
-    if (customMenuItem && customMenuItem.ariaChecked === "true") {
-        console.log("in the if - customMenuItem:", customMenuItem);
-        console.log("aria:", customMenuItem.ariaChecked);
-        const label = customMenuItem.querySelector(".ytp-speedslider-text");
-        const slider = customMenuItem.querySelector(".ytp-speedslider");
-
-        slider.value = newSpeed;
-        label.textContent = newSpeed.toFixed(2);
-
-        slider.dispatchEvent(new Event("input", {bubbles: true}));
-    }
-    
     ytPlayer.setPlaybackRate(newSpeed);
     lastSpeed = newSpeed;
-    displaySpeed(newSpeed);    
+    displaySpeed(newSpeed);
+
+    // const customMenuItem = ytPlayer.querySelector(".ytp-menuitem-with-footer");
+    // if (customMenuItem && customMenuItem.getAttribute('aria-checked') === "true") {
+    //     const slider = customMenuItem.querySelector(".ytp-speedslider");
+    //     const itemLabel = customMenuItem.querySelector(".ytp-menuitem-label");
+    //     const sliderLabel = customMenuItem.querySelector(".ytp-speedslider-text");
+
+    //     // slider.value = newSpeed;
+    //     // sliderLabel.textContent = newSpeed.toFixed(2);
+    //     // itemLabel.textContent = `Custom (${newSpeed.toFixed(2)})`;
+
+    //     slider.dispatchEvent(new Event("input", {bubbles: true}));
+        
+    // }
+ //1.2
+ // .25 - 1.2 = .95
+ // 1 - 1.2 = .2
+ // 1.25 - 1.2 = .05
+ // 1.25 .12  .13 .12
+    
+    
 }
 
 function overrideMediaMethod(method) {
@@ -104,8 +113,8 @@ function handleMediaOverride(video, method) {
 
     ytPlayer.addEventListener("onStateChange", (state) => {
         console.log("state:", state);
-        //playing/unstarted
-        if (state === 1) {
+        //playing
+        if (state === 1 || state === -1) {
             const newVideo = ytPlayer.getVideoData().video_id;
             if (currentVideo !== newVideo) {
                 console.log("state change - new vid - set defaults");
@@ -174,23 +183,8 @@ function setupSettingsMenuObserver() {
     const observer = new MutationObserver((mutations) => {
         console.log("mutations:", mutations);
         const menuItems = settingsMenu.querySelectorAll(".ytp-menuitem");
-        menuItems.forEach((item, index) => {
-            //custom slider item
-            if (index === 0 && item.classList.contains("ytp-menuitem-with-footer")) {
-                const itemLabel = item.querySelector(".ytp-menuitem-label");
-                const sliderLabel = item.querySelector(".ytp-speedslider-text");
-                const slider = item.querySelector(".ytp-speedslider");
 
-                if (item.ariaChecked === "true") {
-                    sliderLabel.textContent = lastSpeed.toFixed(2) + "x";
-                    slider.value = lastSpeed;
-                    slider.dispatchEvent(new Event("input", {bubbles: true}));
-                }
-
-                console.log("slider:", slider);
-                console.log("set slider label value to:", slider.value);
-                itemLabel.textContent = `Custom (${parseFloat(slider.value).toFixed(2)})`;
-            }
+        menuItems.forEach((item) => {
             if (!item.hasMyOnClick) {
                 item.hasMyOnClick = true;
                 item.addEventListener("click", () => {

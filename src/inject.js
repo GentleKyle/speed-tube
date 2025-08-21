@@ -7,11 +7,12 @@
                 speedUp: {modifiers: [], key: "x"},
                 speedDown: {modifiers: [], key: "z"}
             },
-            maxPBR: 6
+            maxPBR: 6,
+            incrementPBRVal: .25,
+            decrementPBRVal: .25
         };
-        //max > 2
+
         const defaultsString = JSON.stringify(defaults);
-console.log("is this running?");
         const script = document.createElement("script");
         
         script.src = chrome.runtime.getURL("/src/script.js");

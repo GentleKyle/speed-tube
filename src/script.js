@@ -9,39 +9,40 @@ let timerId = null;
 let lastSpeed = defaults.playbackRate;
 let settingsObserver = null;
 
+//if we want to try and add the slider back could try to clone it 
+//clone(removes listeners from YT) - replace - attach my listeners - code behavior
+//prolly quite brittle
+
+//could add smaller increments with favorites at the top of the list
 function main() {
 
-console.log("main");
     overrideMediaMethod("play"); 
     overrideMediaMethod("pause"); 
     //overrideMediaMethod("load"); //caused issue certain cases - seems fine without     
 
-    //setupUrlObserver();
-
     window.addEventListener("keyup", (event) => {
         if (!ytPlayer || !ytPlayer.isConnected) {
-            console.log("escaped event listener cus no ytPlayer");
             return;
         }
-console.log(event);
+
         const isPressed = (modifier) => event[modifier];
         let currentSpeed = ytPlayer.getPlaybackRate();
-        console.log("currentSpeed:", currentSpeed);
+
         if (defaults.keybinds.speedUp.modifiers.every(isPressed)) {
             if (event.key === defaults.keybinds.speedUp.key) {
-                setSpeed(currentSpeed + .25);
+                setSpeed(currentSpeed + defaults.incrementPBRVal);
             }
         }
         if (defaults.keybinds.speedDown.modifiers.every(isPressed)) {
             if (event.key === defaults.keybinds.speedDown.key) {
-                setSpeed(currentSpeed - .25);
+                setSpeed(currentSpeed - defaults.decrementPBRVal);
             }
         }
     })
 }
-//ensure that label matches slider value
+
 function setSpeed(newSpeed) {
-    console.log("newSpeed, lastSpeed", newSpeed, lastSpeed);
+
     if (newSpeed > defaults.maxPBR) {
         newSpeed = defaults.maxPBR;
     }
@@ -52,27 +53,6 @@ function setSpeed(newSpeed) {
     ytPlayer.setPlaybackRate(newSpeed);
     lastSpeed = newSpeed;
     displaySpeed(newSpeed);
-
-    // const customMenuItem = ytPlayer.querySelector(".ytp-menuitem-with-footer");
-    // if (customMenuItem && customMenuItem.getAttribute('aria-checked') === "true") {
-    //     const slider = customMenuItem.querySelector(".ytp-speedslider");
-    //     const itemLabel = customMenuItem.querySelector(".ytp-menuitem-label");
-    //     const sliderLabel = customMenuItem.querySelector(".ytp-speedslider-text");
-
-    //     // slider.value = newSpeed;
-    //     // sliderLabel.textContent = newSpeed.toFixed(2);
-    //     // itemLabel.textContent = `Custom (${newSpeed.toFixed(2)})`;
-
-    //     slider.dispatchEvent(new Event("input", {bubbles: true}));
-        
-    // }
- //1.2
- // .25 - 1.2 = .95
- // 1 - 1.2 = .2
- // 1.25 - 1.2 = .05
- // 1.25 .12  .13 .12
-    
-    
 }
 
 function overrideMediaMethod(method) {
@@ -82,42 +62,35 @@ function overrideMediaMethod(method) {
     HTMLMediaElement.prototype[method] = function() {
         const ogReturn = ogMethod.apply(this);
 
-        handleMediaOverride(this, method);
+        handleMediaOverride(this);
 
         return ogReturn;
     }
-    console.log("override ", method);
 }
-//
-function handleMediaOverride(video, method) {
-    console.log("entry method:", method);
+
+function handleMediaOverride(video) {
 
     if (ytPlayer !== video.parentElement.parentElement) {
         if (settingsObserver) {
             settingsObserver.disconnect();
-            console.log("observer disconnected");
         }
 
         ytPlayer = video.parentElement.parentElement; 
-        console.log("set ytPlayer to:", ytPlayer,);
 
         setupSettingsMenuObserver();
     }
 
     if (!ytPlayer.getAvailablePlaybackRates().includes(defaults.maxPBR)) {
         for (let i = 2.25; i <= defaults.maxPBR; i += .25) {
-            console.log(i, method);
             ytPlayer.getAvailablePlaybackRates().push(i);
         }
     }
 
     ytPlayer.addEventListener("onStateChange", (state) => {
-        console.log("state:", state);
-        //playing
+        //playing/unstarted
         if (state === 1 || state === -1) {
             const newVideo = ytPlayer.getVideoData().video_id;
             if (currentVideo !== newVideo) {
-                console.log("state change - new vid - set defaults");
                 ytPlayer.setPlaybackRate(defaults.playbackRate);
                 lastSpeed = defaults.playbackRate;
                 currentVideo = newVideo;
@@ -143,18 +116,16 @@ function displaySpeed(speed) {
         })
 
         ytPlayer.append(newDiv);
-     console.log("(no exist)appended to: ", ytPlayer);   
     }
     else { //make sure it is in the right spot
         const myDiv = document.getElementById("my_pbr_display");
         if (!Array.from(ytPlayer.children).includes(myDiv)) {
             ytPlayer.appendChild(myDiv);
-            console.log("(moved)appended to: ", ytPlayer); 
         }
     }
     
     const speedDiv = document.getElementById("my_pbr_display");
-    speedDiv.textContent = `${speed}x`;
+    speedDiv.textContent = `${parseFloat(speed).toFixed(2)}x`;
     //for when keypress is during fadeout
     speedDiv.classList.remove("my_fadeout");
     speedDiv.style.opacity = 0.8;
@@ -176,49 +147,25 @@ function displaySpeed(speed) {
     }
 }
 
+//use default clicking behavior but I know what to set it back to on play/pause
 function setupSettingsMenuObserver() {
     const settingsMenu = ytPlayer.querySelector("#ytp-id-18");
-    console.log("observer setup, settingsMenu:", settingsMenu);
 
-    const observer = new MutationObserver((mutations) => {
-        console.log("mutations:", mutations);
+    const observer = new MutationObserver(() => {
         const menuItems = settingsMenu.querySelectorAll(".ytp-menuitem");
 
         menuItems.forEach((item) => {
             if (!item.hasMyOnClick) {
                 item.hasMyOnClick = true;
                 item.addEventListener("click", () => {
-                    console.log("this was clicked:", item);
                     lastSpeed = ytPlayer.getPlaybackRate();
                 });
             }
         });
     });
-//SEEMS TO WORK - TEST REMOVING STUFF THAT MAYBE i DO NOT NEED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     observer.observe(settingsMenu, {childList: true});
     settingsObserver = observer;
 }
-
-// function onYtPlayerReady(callback) {
-//     const maxTries = 22;
-//     let tryNum = 0;
-// console.log("in player ready");
-//     const intervalId = setInterval(() => {
-//         tryNum++;
-        
-//         const ytPlayer = currentVideo.parentElement.parentElement;
-
-//         if (ytPlayer && typeof ytPlayer.getPlaybackRate === "function" && typeof ytPlayer.getPlaybackRate() === "number") {
-//             clearInterval(intervalId);
-//             callback(ytPlayer);
-//         }
-//         else {
-//             if (tryNum >= maxTries) {
-//                 clearInterval(intervalId);
-//                 console.error("Reached max tries waiting for YouTube player API to load.");
-//             }
-//         }
-//     }, 500);
-// }
 
 main();

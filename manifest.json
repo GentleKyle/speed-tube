@@ -1,21 +1,44 @@
 {
     "manifest_version": 3,
-    "name": "Speed Tube",
-    "description": "Sets default playback speed at 2.0x and ctrl + down/up arrows decrease/increase speed",
+    "name": "Green Bunny: A Seamless Controller for YouTube",
+    "description": "Get YouTube playback speeds over 2x built into the native UI. Hotkeys and a default speed that work with shorts. Simple and clean.",
     "version": "1.0",
-    "icons" : {},
+    "action": {
+        "default_icon": {
+            "16": "/static/icons/16_bunny.png",
+            "32": "/static/icons/32_bunny.png",
+            "48": "/static/icons/48_bunny.png",
+            "128": "/static/icons/128_bunny.png"            
+        },
+        "default_title": "Green Bunny: A Seamless Controller for YouTube"
+    },
+    "icons" : {
+        "16": "/static/icons/16_bunny.png",
+        "32": "/static/icons/32_bunny.png",
+        "48": "/static/icons/48_bunny.png",
+        "128": "/static/icons/128_bunny.png"
+    },
+    "permissions": [
+        "storage"
+    ],
     "content_scripts": [
         {
             "js": [
-                "/src/script.js"
+                "/src/inject.js"
             ],
-            "run_at": "document_start",
+            "run_at": "document_idle",
             "matches": [
                 "https://www.youtube.com/*"
             ],
             "css": [
                 "src/styles.css"
             ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["/src/script.js"],
+            "matches": ["https://www.youtube.com/*"]
         }
     ]
 }

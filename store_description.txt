@@ -1,0 +1,121 @@
+_______________________________________________________________
+
+Green Bunny is a YouTube speed controller extension with keyboard shortcuts that seamlessly integrates with YouTube's existing playback speed interface. Unlike other YouTube speed extensions that overlay clunky controls, Green Bunny's enhanced video speeds (up to 6.0x) appear directly in YouTube's native settings menu for seamless video speed control.
+
+_______________________________________________________________
+
+How To Use:
+
+Press:
+"Z" - reduce playback speed by 0.25x
+"X" - increase playback speed by 0.25x
+
+Alternatively, go into the normal/default YouTube playback speed menu to see and select a speed from 0.25x to 6.0x.
+
+That's it! Clean and simple.
+_______________________________________________________________
+
+Key Features:
+
+WORKS EVERYWHERE:
+- Full compatibility with regular videos, YouTube Shorts, and even video previews.
+
+DEFAULT SPEED:
+- New videos automatically start at 2.0x video speed.
+
+UNLOCKED SPEEDS:
+- Go beyond the default 2.0x playback speed limit and speed up YouTube videos like never before! Green Bunny adds more speed options letting you fly through lectures, podcasts, and videos at your own pace. 
+
+KEY BINDS/KEYBOARD SHORTCUTS:
+- "Z" and "X" hotkeys for quickly adjusting playback rate without the mouse!
+
+VISUAL FEEDBACK:
+- On key press there is a non-intrusive display of the current playback speed that fades away after a short delay.
+
+NATIVE INTEGRATION:
+- Increased speed options appear in YouTube's own settings menu - nothing extra.
+
+LIGHTWEIGHT & FAST:
+- No noticeable performance impact. It is a drop in the bucket compared to what YouTube is doing. 
+
+COMING SOON:
+- Custom key binds, speeds, adjustment size, default speed
+- Disable key binds while typing in search bar
+- Adjust default speed based on channel (ex. music channels)
+
+PRIVACY:
+- No tracking, analytics, or personal information storage. 
+- No ads.
+- Free.
+_______________________________________________________________
+
+I want to hear from you! Help me make Green Bunny better!
+Please email me feature requests, suggestions, bugs, and general feedback about your experience.
+
+Please give Green Bunny a try today!
+
+Thank you! :)
+
+
+
+
+
+
+
+
+
+
+_______________________________________________________________
+
+Green Bunny is a YouTube speed controller extension with keyboard shortcuts that seamlessly integrates with YouTube's existing playback speed interface. Unlike other YouTube speed extensions that overlay clunky controls, Green Bunny's enhanced video speeds (up to 6.0x) appear directly in YouTube's native settings menu for seamless video speed control.
+
+_______________________________________________________________
+
+HOW TO USE:
+
+- Use Hotkeys: ***  Press "X" to increase and "Z" to decrease playback speed.  ***
+
+- Use the Menu: Open the YouTube settings menu (the gear icon) and select your desired speed (up to 6.0x!)
+
+That's it! Clean and simple.
+_______________________________________________________________
+
+SEAMLESS NATIVE INTEGRATION:
+- Increased speed options appear in YouTube's own settings menu - nothing extra.
+
+UNLOCK FASTER SPEEDS:
+- Go beyond the default 2.0x playback speed limit and speed up YouTube videos like never before! Green Bunny adds more speed options letting you fly through lectures, podcasts, and videos at your own pace. 
+
+KEY BINDS/KEYBOARD SHORTCUTS:
+- "Z" and "X" hotkeys for quickly adjusting playback rate without the mouse!
+
+WORKS WITH SHORTS:
+- Full compatibility with regular videos, YouTube Shorts, and even video previews.
+
+DEFAULT SPEED:
+- New videos automatically start at 2.0x video speed.
+
+VISUAL FEEDBACK:
+- A non-intrusive display of the current speed appears on screen when you use a hotkey, then gently fades away.
+
+LIGHTWEIGHT & FAST:
+- Built to be efficient. No noticeable performance impact on your browsing experience.
+
+PRIVACY:
+- No tracking, analytics, or personal information storage. 
+- No ads.
+- Free.
+_______________________________________________________________
+
+COMING SOON:
+- Custom key binds, speeds, adjustment size, default speed
+- Disable key binds while typing in search bar
+- Adjust default speed based on channel (e.g. music channels)
+Note - I removed the custom speed slider as it was buggy. I will work to add it back in a more stable state if there is demand. 
+
+I want to hear from you! 
+Green Bunny is here for you, and your feedback is essential. Please feel free to email me with feature requests, suggestions, or any bugs.
+
+Thank you for trying Green Bunny! :)
+
+- My name

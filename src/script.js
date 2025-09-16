@@ -14,7 +14,7 @@ function main() {
 
     overrideMediaMethod("play"); 
     overrideMediaMethod("pause"); 
-    overrideMediaMethod("load"); //caused issue certain cases - seems fine without     
+    //overrideMediaMethod("load"); //caused issue certain cases - seems fine without     
 
     window.addEventListener("keyup", (event) => {
 
@@ -58,7 +58,6 @@ const bunnyPlayer = {
     currentVideoId: null,
     displayTimerId: null,
     observerTimerId: null,
-    myPanel: null,
 //does this get weird if there is more than one video? Like main vid playing then hover for preview and we lose main vid
     init(videoElement) { 
         this.video = videoElement;
@@ -203,8 +202,8 @@ console.log("mutation"); //remove ytPlayer reference here and run this in main??
                 clearTimeout(this.observerTimerId);
                 this.observerTimerId = setTimeout(() => {
                     console.log("timer finished in if");
-                    this._handleSettingsMenu(obs);//what if I just use youtubes stuff for .25 to 2 and then do my own thing above that !!!!!!
-                    this.observerTimerId = null; //then just change the menu visually
+                    this._handleSettingsMenu(obs);
+                    this.observerTimerId = null; 
                 }, 50);            
             }
             else {
@@ -221,52 +220,68 @@ console.log("mutation"); //remove ytPlayer reference here and run this in main??
         this.settingsObserver = observer;
     },
 
-    _handleSettingsMenu(obs) { //make back button work - also always remove
+    _handleSettingsMenu(obs) { 
         const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
         const panelTitle = settingsMenu.querySelector(".ytp-panel-title");
         let panel;
         if (panelTitle) {
             panel = panelTitle.closest(".ytp-panel");
         }
+        
 
         if (panel && panelTitle) {
             if (panelTitle.textContent.includes("Playback speed") && panel.querySelector(".ytp-menuitem")) {
-                //console.log(this);
+                const panelMenu = panel.querySelector(".ytp-panel-menu");
+                let newMenuItems = panel.querySelectorAll(".ytp-menuitem");
+
                 obs.disconnect();
-                this.myPanel = panel.cloneNode(true);
-                panel.replaceWith(this.myPanel);
-                const newMenuItems = this.myPanel.querySelectorAll(".ytp-menuitem");
-                let currentSpeed = this.video ? this.video.playbackRate.toString() : defaults.playbackRate.toString();
+                
+                if (newMenuItems.length < 10) {
+                    newMenuItems.forEach((item) => {
+                        let speed = item.textContent;
+                        if (speed === "Normal") {
+                            speed = "1";
+                        }
+                        item.addEventListener("click", () => {
+                            this.speed = parseFloat(speed);
+                        })
+                    })
+
+                    for (let i = 2.25; i <= defaults.maxPBR; i += .25) {
+                        const clonedItem = newMenuItems[newMenuItems.length - 1].cloneNode(true);
+                        clonedItem.querySelector(".ytp-menuitem-label").textContent = i.toString();
+
+                        clonedItem.addEventListener("click", () => {
+                            this.setSpeedTo(parseFloat(clonedItem.textContent));
+                            panel.remove();
+                        })
+
+                        panelMenu.appendChild(clonedItem);
+                    }       
+                }
+
+
+                let currentSpeed = this.speed.toString();
                 if (currentSpeed === "1") {
                     currentSpeed = "Normal";
                 }
-                console.log(newMenuItems);
                 
+                newMenuItems = panel.querySelectorAll(".ytp-menuitem");
                 newMenuItems.forEach((item) => {
-                    console.log(item);
+                    //could change this to round to nearest
                     if (item.textContent === currentSpeed) {
                         item.setAttribute("aria-checked", "true");
                     }
                     else {
                         item.setAttribute("aria-checked", "false");
                     }
-
-                    item.addEventListener("click", () => {
-                        console.log("clicked"); 
-                        if (item.textContent.includes("Normal")) {
-                            this.setSpeedTo(1);
-                        }
-                        else {
-                            this.setSpeedTo(parseFloat(item.textContent));
-                        }
-                        this.myPanel.remove();
-                    })
                 })
                 
                 
             }
+            obs.observe(settingsMenu, {childList: true, subtree: true});
         }
-        obs.observe(settingsMenu, {childList: true, subtree: true});
+        
         
     },
 };

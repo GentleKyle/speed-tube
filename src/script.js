@@ -53,39 +53,86 @@ function overrideMediaMethod(method) {
 const bunnyPlayer = {
     ytPlayer: null,
     video: null,
-    speed: defaults.playbackRate, //do not think I need this anymore
+    speed: defaults.playbackRate, 
     settingsObserver: null,
     currentVideoId: null,
     displayTimerId: null,
     observerTimerId: null,
-//does this get weird if there is more than one video? Like main vid playing then hover for preview and we lose main vid
+
     init(videoElement) { 
+        let ytPlayer = document.getElementById("movie_player");
+        if (videoElement) { 
+            if (ytPlayer !== videoElement.parentElement.parentElement) {
+                ytPlayer = videoElement.parentElement.parentElement;
+            }
+        }
+
         this.video = videoElement;
 
-        if (this.ytPlayer !== videoElement.parentElement.parentElement) {
-            this.ytPlayer = videoElement.parentElement.parentElement;
+        if (this.ytPlayer !== ytPlayer) {
+            this.ytPlayer = ytPlayer;
 
             this.ytPlayer.addEventListener("onStateChange", (state) => {
                 const newVideoId = this.ytPlayer.getVideoData().video_id;
                 if (this.currentVideoId !== newVideoId) {
-                    this.speed = defaults.playbackRate;
+                    //set default only if it is not the first video
+                    //(it could not autoplay and user could manually change speed before playing)
+                    if (this.currentVideoId !== null) {
+                        this.speed = defaults.playbackRate;
+                    }
                     this.currentVideoId = newVideoId;
-                    this.setupSettingsMenuObserver();
+
+                    this.setupSettingsMenuObserver(); 
                 }
 
                 //playing
                 if (state === 1) {
-                    this.setSpeedTo(this.speed);
+                    this._setSpeedTo(this.speed);
                 }
             //other states
             // -1(unstarted) 0(ended) 1(playing) 2(paused) 3(buffering) 
             // 5(video cued - loaded but not playing)
             });
-
-            //this.setupSettingsMenuObserver();
-            this.updateYtMenuDisplay();
         }
 
+        this.setupSettingsMenuObserver();
+    },
+
+    setupSettingsMenuObserver() {
+        if (this.ytPlayer.isSetup) {
+            return;
+        }
+        this.ytPlayer.isSetup = true;
+
+        if (this.settingsObserver) {
+            this.settingsObserver.disconnect();
+        }
+
+        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
+
+        const observer = new MutationObserver((list, obs) => {
+            obs.disconnect();
+            this._updateYtMenuDisplay();
+            obs.observe(settingsMenu, {childList: true, subtree: true});
+
+//debouncing - to wait for full render cycle
+            if (this.observerTimerId) {
+                clearTimeout(this.observerTimerId);
+                this.observerTimerId = setTimeout(() => {
+                    this._handleSpeedMenu(obs);
+                    this.observerTimerId = null; 
+                }, 50);            
+            }
+            else {
+                this.observerTimerId = setTimeout(() => {
+                    this._handleSpeedMenu(obs);
+                    this.observerTimerId = null;
+                }, 50);               
+            }
+        });
+
+        observer.observe(settingsMenu, {childList: true, subtree: true});
+        this.settingsObserver = observer;
     },
 
     displaySpeed() {
@@ -108,7 +155,7 @@ const bunnyPlayer = {
         }
         
         const speedDiv = document.getElementById("my_pbr_display");
-        speedDiv.textContent = `${parseFloat(this.video.playbackRate).toFixed(2)}x`;
+        speedDiv.textContent = `${parseFloat(this.speed).toFixed(2)}x`;
         //for when keypress is during fadeout
         speedDiv.classList.remove("my_fadeout");
         speedDiv.style.opacity = 0.8;
@@ -130,7 +177,15 @@ const bunnyPlayer = {
         }
     },
 
-    setSpeedTo(newSpeed) {
+    incrementSpeed() {
+        this._setSpeedTo(this.speed + defaults.incrementPBRVal);
+    },
+
+    decrementSpeed() {
+        this._setSpeedTo(this.speed - defaults.decrementPBRVal);
+    },
+
+    _setSpeedTo(newSpeed) {
         if (newSpeed > defaults.maxPBR) {
             newSpeed = defaults.maxPBR;
         }
@@ -139,29 +194,23 @@ const bunnyPlayer = {
         }
 
         this.speed = newSpeed;
-        this.video.playbackRate = newSpeed;
-        this.updateYtMenuDisplay();
+
+        if (this.video) {
+            this.video.playbackRate = newSpeed;            
+        }
+
+        this._updateYtMenuDisplay();
     },
 
-    incrementSpeed() {
-        if (!this.video) {
+    _updateYtMenuDisplay() { 
+        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18"); 
+
+        //for short/preview
+        if (!settingsMenu) {
             return;
         }
 
-        this.setSpeedTo(this.video.playbackRate + defaults.incrementPBRVal);
-    },
-
-    decrementSpeed() {
-        if (!this.video) {
-            return;
-        }
-
-        this.setSpeedTo(this.video.playbackRate - defaults.decrementPBRVal);
-    },
-
-    updateYtMenuDisplay() { 
-        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
-        const menuItems = settingsMenu.querySelectorAll(".ytp-menuitem");
+        const menuItems = settingsMenu.querySelectorAll(".ytp-menuitem"); 
         let speed = this.speed.toString();
         if (speed === "1") {
             speed = "Normal";
@@ -173,60 +222,18 @@ const bunnyPlayer = {
             }
         });
 
+        this._setSpeedMenuCheckmark();
+
     },
 
-    setupSettingsMenuObserver() {
-        if (this.settingsObserver) {
-            this.settingsObserver.disconnect();
-        }
-
-        
-console.log("mutation"); //remove ytPlayer reference here and run this in main?????!!!!!!!!
-        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
-
-        const observer = new MutationObserver((list, obs) => {
-            console.log("observe");
-            
-            obs.disconnect();
-            if (this.myPanel) {
-                //returns null if parent display: none
-                if (!this.myPanel.offsetParent) {
-                    this.myPanel.remove();
-                }
-            }
-            this.updateYtMenuDisplay();
-            obs.observe(settingsMenu, {childList: true, subtree: true});
-//debouncing
-            if (this.observerTimerId) {
-                console.log("reset timer");
-                clearTimeout(this.observerTimerId);
-                this.observerTimerId = setTimeout(() => {
-                    console.log("timer finished in if");
-                    this._handleSettingsMenu(obs);
-                    this.observerTimerId = null; 
-                }, 50);            
-            }
-            else {
-                console.log("start timer");
-                this.observerTimerId = setTimeout(() => {
-                    console.log("timer finished");
-                    this._handleSettingsMenu(obs);
-                    this.observerTimerId = null;
-                }, 50);               
-            }
-        });
-
-        observer.observe(settingsMenu, {childList: true, subtree: true});
-        this.settingsObserver = observer;
-    },
-
-    _handleSettingsMenu(obs) { 
+    _handleSpeedMenu(obs) { 
         const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
         const panelTitle = settingsMenu.querySelector(".ytp-panel-title");
         let panel;
         if (panelTitle) {
             panel = panelTitle.closest(".ytp-panel");
         }
+        const backButton = settingsMenu.querySelector(".ytp-panel-back-button");
         
 
         if (panel && panelTitle) {
@@ -236,6 +243,7 @@ console.log("mutation"); //remove ytPlayer reference here and run this in main??
 
                 obs.disconnect();
                 
+                //default youtube speed is 9 items - we only add custom once
                 if (newMenuItems.length < 10) {
                     newMenuItems.forEach((item) => {
                         let speed = item.textContent;
@@ -252,36 +260,68 @@ console.log("mutation"); //remove ytPlayer reference here and run this in main??
                         clonedItem.querySelector(".ytp-menuitem-label").textContent = i.toString();
 
                         clonedItem.addEventListener("click", () => {
-                            this.setSpeedTo(parseFloat(clonedItem.textContent));
-                            panel.remove();
+                            this._setSpeedTo(parseFloat(clonedItem.textContent));
+                            if (backButton) {
+                                backButton.click();
+                            }
+                            else {
+                                panel.remove();
+                            }
                         })
 
                         panelMenu.appendChild(clonedItem);
                     }       
                 }
 
-
-                let currentSpeed = this.speed.toString();
-                if (currentSpeed === "1") {
-                    currentSpeed = "Normal";
-                }
-                
-                newMenuItems = panel.querySelectorAll(".ytp-menuitem");
-                newMenuItems.forEach((item) => {
-                    //could change this to round to nearest
-                    if (item.textContent === currentSpeed) {
-                        item.setAttribute("aria-checked", "true");
-                    }
-                    else {
-                        item.setAttribute("aria-checked", "false");
-                    }
-                })
-                
-                
+                this._setSpeedMenuCheckmark();
             }
             obs.observe(settingsMenu, {childList: true, subtree: true});
         }
         
         
     },
+
+    _setSpeedMenuCheckmark() {
+        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
+        let panelTitle;
+        let panel;
+        let speedOptions;
+
+        if (settingsMenu) {
+            panelTitle = settingsMenu.querySelector(".ytp-panel-title");
+        }
+        else {
+            return;
+        }
+        if (panelTitle) {
+            if (panelTitle.textContent.includes("Playback speed")) {
+                panel = panelTitle.closest(".ytp-panel");
+            }
+        }
+        else {
+            return;
+        }
+        if (panel) {
+            speedOptions = panel.querySelectorAll(".ytp-menuitem");
+        }
+        else {
+            return;
+        }
+
+        let currentSpeed = this.speed.toString();
+        if (currentSpeed === "1") {
+            currentSpeed = "Normal";
+        }
+        
+        speedOptions.forEach((speedOption) => {
+            //could change this to round to nearest? I wonder if adding new options between YT's matters to them
+            if (speedOption.textContent === currentSpeed) {
+                speedOption.setAttribute("aria-checked", "true");
+            }
+            else {
+                speedOption.setAttribute("aria-checked", "false");
+            }
+        })
+    },
 };
+

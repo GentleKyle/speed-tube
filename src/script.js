@@ -12,7 +12,7 @@ const defaults = JSON.parse(defaultsString);
 
 function main() {
 
-    overrideMediaMethod("play"); 
+    overrideMediaMethod("play"); //does play on first load
     overrideMediaMethod("pause"); 
     //overrideMediaMethod("load"); //caused issue certain cases - seems fine without     
 
@@ -108,7 +108,7 @@ const bunnyPlayer = {
             this.settingsObserver.disconnect();
         }
 
-        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
+        const settingsMenu = this.ytPlayer.querySelector(".ytp-settings-menu");
 
         const observer = new MutationObserver((list, obs) => {
             obs.disconnect();
@@ -155,7 +155,7 @@ const bunnyPlayer = {
         }
         
         const speedDiv = document.getElementById("my_pbr_display");
-        speedDiv.textContent = `${parseFloat(this.speed).toFixed(2)}x`;
+        speedDiv.textContent = `${this.speed.toFixed(2)}x`;
         //for when keypress is during fadeout
         speedDiv.classList.remove("my_fadeout");
         speedDiv.style.opacity = 0.8;
@@ -203,7 +203,7 @@ const bunnyPlayer = {
     },
 
     _updateYtMenuDisplay() { 
-        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18"); 
+        const settingsMenu = this.ytPlayer.querySelector(".ytp-settings-menu"); 
 
         //for short/preview
         if (!settingsMenu) {
@@ -227,7 +227,7 @@ const bunnyPlayer = {
     },
 
     _handleSpeedMenu(obs) { 
-        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
+        const settingsMenu = this.ytPlayer.querySelector(".ytp-settings-menu");
         const panelTitle = settingsMenu.querySelector(".ytp-panel-title");
         let panel;
         if (panelTitle) {
@@ -252,6 +252,7 @@ const bunnyPlayer = {
                         }
                         item.addEventListener("click", () => {
                             this.speed = parseFloat(speed);
+                            this._setSpeedTo(parseFloat(speed));
                         })
                     })
 
@@ -282,7 +283,7 @@ const bunnyPlayer = {
     },
 
     _setSpeedMenuCheckmark() {
-        const settingsMenu = this.ytPlayer.querySelector("#ytp-id-18");
+        const settingsMenu = this.ytPlayer.querySelector(".ytp-settings-menu");
         let panelTitle;
         let panel;
         let speedOptions;
